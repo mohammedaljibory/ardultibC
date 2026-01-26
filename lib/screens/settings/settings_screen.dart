@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
       }
     } catch (e) {
-      print('Error loading settings: $e');
+      // Error loading settings - use defaults
     }
   }
 

@@ -45,12 +45,10 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
             _galleryImage = File(pickedFile.path);
           }
         });
-        print("Image picked: ${pickedFile.path}");
       } else {
-        print("No image selected");
+        // No image selected
       }
     } catch (e) {
-      print("Error picking image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error picking image: $e")),
       );
@@ -90,10 +88,8 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
     });
 
     try {
-      print("Compressing post image...");
       final compressedImage = await _compressImage(_postImage!);
 
-      print("Uploading post image...");
       final storageRef = FirebaseStorage.instance.ref().child('posts/post_${DateTime.now().millisecondsSinceEpoch}.jpg');
       UploadTask uploadTask = storageRef.putFile(
         compressedImage,
@@ -104,7 +100,6 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
         setState(() {
           _uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
         });
-        print("Upload progress: ${(_uploadProgress * 100).toStringAsFixed(2)}%");
       });
 
       await uploadTask;
@@ -130,7 +125,6 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
       setState(() {
         _isUploadingPost = false;
       });
-      print("Error uploading post image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error uploading post image: $e")),
       );
@@ -151,10 +145,8 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
     });
 
     try {
-      print("Compressing gallery image...");
       final compressedImage = await _compressImage(_galleryImage!);
 
-      print("Uploading gallery image...");
       final storageRef = FirebaseStorage.instance.ref().child('gallery/gallery_${DateTime.now().millisecondsSinceEpoch}.jpg');
       UploadTask uploadTask = storageRef.putFile(
         compressedImage,
@@ -165,7 +157,6 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
         setState(() {
           _uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes);
         });
-        print("Upload progress: ${(_uploadProgress * 100).toStringAsFixed(2)}%");
       });
 
       await uploadTask;
@@ -191,7 +182,6 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
       setState(() {
         _isUploadingGallery = false;
       });
-      print("Error uploading gallery image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error uploading gallery image: $e")),
       );
@@ -223,17 +213,12 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
       if (url.isNotEmpty && url.startsWith('https://firebasestorage.googleapis.com')) {
         final storageRef = FirebaseStorage.instance.refFromURL(url);
         await storageRef.delete();
-        print("Image deleted from Storage");
-      } else {
-        print("Invalid URL, skipping Storage deletion: $url");
       }
       await collection.doc(docId).delete();
-      print("Document deleted from Firestore");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Image deleted successfully!")),
       );
     } catch (e) {
-      print("Error deleting image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error deleting image: $e")),
       );

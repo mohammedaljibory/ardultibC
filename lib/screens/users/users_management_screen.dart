@@ -571,18 +571,31 @@ class UserOrdersScreen extends StatelessWidget {
   }
 }
 
-class SendNotificationDialog extends StatelessWidget {
+class SendNotificationDialog extends StatefulWidget {
   final String userId;
   final String? userName;
+
+  const SendNotificationDialog({Key? key, required this.userId, this.userName}) : super(key: key);
+
+  @override
+  State<SendNotificationDialog> createState() => _SendNotificationDialogState();
+}
+
+class _SendNotificationDialogState extends State<SendNotificationDialog> {
   final titleController = TextEditingController();
   final messageController = TextEditingController();
 
-  SendNotificationDialog({required this.userId, this.userName});
+  @override
+  void dispose() {
+    titleController.dispose();
+    messageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('إرسال إشعار إلى ${userName ?? 'المستخدم'}'),
+      title: Text('إرسال إشعار إلى ${widget.userName ?? 'المستخدم'}'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -617,7 +630,7 @@ class SendNotificationDialog extends StatelessWidget {
 
             try {
               await FirebaseFirestore.instance.collection('notifications').add({
-                'userId': userId,
+                'userId': widget.userId,
                 'title': titleController.text,
                 'message': messageController.text,
                 'type': 'admin_message',

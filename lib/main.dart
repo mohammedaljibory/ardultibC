@@ -19,9 +19,8 @@ void main() async {
     // If not authenticated, sign in anonymously or redirect to login
     try {
       await FirebaseAuth.instance.signInAnonymously();
-      print("Signed in anonymously for storage access");
     } catch (e) {
-      print("Auth error: $e");
+      // Auth error - continue without anonymous sign-in
     }
   }
 

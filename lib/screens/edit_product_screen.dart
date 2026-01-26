@@ -77,7 +77,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         }
       });
     } catch (e) {
-      print('Error loading categories: $e');
+      // Error loading categories - continue with empty list
     }
   }
   Future<void> _pickImage() async {
@@ -188,7 +188,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         try {
           await FirebaseStorage.instance.refFromURL(oldThumbnail).delete();
         } catch (e) {
-          print('Error deleting old thumbnail: $e');
+          // Error deleting old thumbnail - continue
         }
       }
 
@@ -253,10 +253,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
             _uploadProgress = uploadedCount / totalImages;
           });
 
-          print('Uploaded image $uploadedCount of $totalImages');
-
         } catch (e) {
-          print('Error uploading image $uploadedCount: $e');
+          // Error uploading individual image - continue with others
         }
       }
 
@@ -303,7 +301,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           await FirebaseStorage.instance.refFromURL(imageUrl).delete();
         }
       } catch (e) {
-        print('Error deleting image from storage: $e');
+        // Error deleting image from storage - continue
       }
 
       setState(() {

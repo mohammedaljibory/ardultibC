@@ -41,7 +41,7 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
         categories = loadedCategories;
       });
     } catch (e) {
-      print('Error loading categories: $e');
+      // Error loading categories - continue with empty list
     }
   }
   @override
@@ -371,6 +371,17 @@ class _ProductsManagementScreenState extends State<ProductsManagementScreen> {
                         Image.network(
                           data['thumbnail'],
                           fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                                strokeWidth: 2,
+                              ),
+                            );
+                          },
                           errorBuilder: (context, error, stackTrace) {
                             return Center(
                               child: Icon(Icons.image_not_supported, size: 30, color: Colors.grey),

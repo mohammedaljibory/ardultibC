@@ -45,7 +45,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
         categories = loadedCategories;
       });
     } catch (e) {
-      print('Error loading categories: $e');
+      // Error loading categories - continue with empty list
     }
   }
   Future<void> _performSearch() async {
@@ -92,8 +92,6 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
         isSearching = false;
       });
     } catch (e) {
-      print('Search error: $e');
-
       // Fallback: if array-contains-any fails, do a client-side search
       try {
         final snapshot = await itemsCollection.limit(200).get();
