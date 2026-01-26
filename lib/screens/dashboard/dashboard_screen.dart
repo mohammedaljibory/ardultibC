@@ -249,6 +249,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .where('read', isEqualTo: false)
           .snapshots(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return IconButton(
+            icon: Icon(Icons.notifications_outlined, color: Colors.grey),
+            onPressed: () => _showNotifications(context),
+          );
+        }
         final unreadCount = snapshot.data?.docs.length ?? 0;
 
         return Stack(

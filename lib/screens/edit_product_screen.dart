@@ -272,7 +272,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         _isUploadingMultiple = false;
         _uploadProgress = 0.0;
       });
-      throw e;
+      rethrow;
     }
   }
 

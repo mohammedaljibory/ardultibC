@@ -577,9 +577,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           .collection('settings')
           .doc('delivery')
           .set({
-        'deliveryFee': int.parse(_deliveryFeeController.text),
-        'minimumOrder': int.parse(_minimumOrderController.text),
-        'freeDeliveryThreshold': int.parse(_freeDeliveryController.text),
+        'deliveryFee': int.tryParse(_deliveryFeeController.text) ?? 0,
+        'minimumOrder': int.tryParse(_minimumOrderController.text) ?? 0,
+        'freeDeliveryThreshold': int.tryParse(_freeDeliveryController.text) ?? 0,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
