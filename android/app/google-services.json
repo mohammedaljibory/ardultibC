@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "393831943",
+    "project_id": "medicalland-5f8dc",
+    "storage_bucket": "medicalland-5f8dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393831943:android:5edfd068a85d291383aca2",
+        "android_client_info": {
+          "package_name": "com.example.firebase_control_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ7mphPzY1LvD7cSND2kUsnX2mD47ZabE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
