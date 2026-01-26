@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' show min;
 
 import '../order_details_screen.dart';
 
@@ -540,8 +541,6 @@ class _OrdersManagementScreenState extends State<OrdersManagementScreen> {
     final date = timestamp.toDate();
     return DateFormat('yyyy/MM/dd - HH:mm').format(date);
   }
-
-  int min(int a, int b) => a < b ? a : b;
 
   Future<void> _updateOrderStatus(String orderId, String newStatus) async {
     try {

@@ -167,8 +167,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('orders')
-          .where('timestamps.created', isGreaterThanOrEqualTo: _startDate)
-          .where('timestamps.created', isLessThanOrEqualTo: _endDate)
+          .where('timestamps.created', isGreaterThanOrEqualTo: Timestamp.fromDate(_startDate))
+          .where('timestamps.created', isLessThanOrEqualTo: Timestamp.fromDate(_endDate))
           .snapshots(),
       builder: (context, snapshot) {
         final orders = snapshot.data?.docs ?? [];

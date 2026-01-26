@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../orders/order_managment_screen.dart';
+import '../orders/order_management_screen.dart';
 import '../users/users_management_screen.dart';
 import '../products/products_management_screen.dart';
 import '../analytics/analytics_screen.dart';
