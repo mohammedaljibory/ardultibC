@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../category_management_screen.dart';
-//import '../category_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -28,15 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _minimumOrderController = TextEditingController();
   final _freeDeliveryController = TextEditingController();
 
-  // Admin Settings
-  final _currentPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
   bool _isLoading = false;
-  bool _enableNotifications = true;
-  bool _enableOrders = true;
-  bool _maintenanceMode = false;
 
   @override
   void initState() {
@@ -64,7 +55,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _addressEnController.text = data['address_en'] ?? '';
       }
 
-      // Load delivery settings
       final deliveryDoc = await FirebaseFirestore.instance
           .collection('settings')
           .doc('delivery')
@@ -76,96 +66,123 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _minimumOrderController.text = (data['minimumOrder'] ?? 0).toString();
         _freeDeliveryController.text = (data['freeDeliveryThreshold'] ?? 0).toString();
       }
-
-      // Load app settings
-      final appDoc = await FirebaseFirestore.instance
-          .collection('settings')
-          .doc('app')
-          .get();
-
-      if (appDoc.exists) {
-        final data = appDoc.data()!;
-        setState(() {
-          _enableNotifications = data['enableNotifications'] ?? true;
-          _enableOrders = data['enableOrders'] ?? true;
-          _maintenanceMode = data['maintenanceMode'] ?? false;
-        });
-      }
     } catch (e) {
-      // Error loading settings - use defaults
+      // Error loading settings
     }
+  }
+
+  @override
+  void dispose() {
+    _storeNameArController.dispose();
+    _storeNameEnController.dispose();
+    _homeTitleArController.dispose();
+    _homeTitleEnController.dispose();
+    _phoneController.dispose();
+    _whatsappController.dispose();
+    _emailController.dispose();
+    _addressArController.dispose();
+    _addressEnController.dispose();
+    _deliveryFeeController.dispose();
+    _minimumOrderController.dispose();
+    _freeDeliveryController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: Color(0xFFF5F7FA),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
+            Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'الإعدادات',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1a1a2e),
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'إعدادات المتجر والتوصيل',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+
             // Store Information
-            _buildSectionTitle('معلومات المتجر'),
-            _buildStoreInfoSection(),
-            SizedBox(height: 32),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionHeader('معلومات المتجر', Icons.store_outlined),
+                  SizedBox(height: 12),
+                  _buildStoreInfoSection(),
+                  SizedBox(height: 24),
 
-            // Delivery Settings
-            _buildSectionTitle('إعدادات التوصيل'),
-            _buildDeliverySection(),
-            SizedBox(height: 32),
-/*
-            // App Settings
-            _buildSectionTitle('إعدادات التطبيق'),
-            _buildAppSettingsSection(),
-            SizedBox(height: 32),
-*/
-            // Categories Management
+                  _buildSectionHeader('إعدادات التوصيل', Icons.delivery_dining_outlined),
+                  SizedBox(height: 12),
+                  _buildDeliverySection(),
+                  SizedBox(height: 24),
 
-            _buildSectionTitle('إدارة التصنيفات'),
-            _buildCategoriesSection(),
-            SizedBox(height: 32),
-
-            /*
-            // Admin Account
-            _buildSectionTitle('حساب المسؤول'),
-            _buildAdminSection(),
-            SizedBox(height: 32),
-
-            // Backup & Export
-            _buildSectionTitle('النسخ الاحتياطي والتصدير'),
-            _buildBackupSection(),
-            */
-
+                  _buildSectionHeader('إدارة التصنيفات', Icons.category_outlined),
+                  SizedBox(height: 12),
+                  _buildCategoriesSection(),
+                  SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: Color(0xFF667eea).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: Color(0xFF667eea), size: 16),
         ),
-      ),
+        SizedBox(width: 10),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1a1a2e),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildStoreInfoSection() {
     return Container(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
             offset: Offset(0, 2),
           ),
         ],
@@ -174,125 +191,103 @@ class _SettingsScreenState extends State<SettingsScreen> {
         key: _formKey,
         child: Column(
           children: [
+            // Store Name
+            Row(
+              children: [
+                Expanded(child: _buildTextField(_storeNameArController, 'اسم المتجر (عربي)')),
+                SizedBox(width: 12),
+                Expanded(child: _buildTextField(_storeNameEnController, 'Store Name (English)')),
+              ],
+            ),
+            SizedBox(height: 12),
+
+            // Home Title
+            Row(
+              children: [
+                Expanded(child: _buildTextField(_homeTitleArController, 'عنوان الرئيسية (عربي)')),
+                SizedBox(width: 12),
+                Expanded(child: _buildTextField(_homeTitleEnController, 'Home Title (English)')),
+              ],
+            ),
+            SizedBox(height: 12),
+
+            // Contact Info
             Row(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    controller: _storeNameArController,
-                    decoration: InputDecoration(
-                      labelText: 'اسم المتجر (عربي)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
+                  child: _buildTextField(
+                    _phoneController,
+                    'رقم الهاتف',
+                    icon: Icons.phone_outlined,
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 12),
                 Expanded(
-                  child: TextFormField(
-                    controller: _storeNameEnController,
-                    decoration: InputDecoration(
-                      labelText: 'Store Name (English)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
+                  child: _buildTextField(
+                    _whatsappController,
+                    'واتساب',
+                    icon: Icons.chat_outlined,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 12),
+
+            _buildTextField(
+              _emailController,
+              'البريد الإلكتروني',
+              icon: Icons.email_outlined,
+            ),
+            SizedBox(height: 12),
+
+            // Address
             Row(
               children: [
                 Expanded(
-                  child: TextFormField(
-                    controller: _homeTitleArController,
-                    decoration: InputDecoration(
-                      labelText: 'عنوان الصفحة الرئيسية (عربي)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _homeTitleEnController,
-                    decoration: InputDecoration(
-                      labelText: 'Home Page Title (English)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: 'رقم الهاتف',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      prefixIcon: Icon(Icons.phone),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _whatsappController,
-                    decoration: InputDecoration(
-                      labelText: 'واتساب',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                      prefixIcon: Icon(Icons.chat),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'البريد الإلكتروني',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                prefixIcon: Icon(Icons.email),
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _addressArController,
+                  child: _buildTextField(
+                    _addressArController,
+                    'العنوان (عربي)',
                     maxLines: 2,
-                    decoration: InputDecoration(
-                      labelText: 'العنوان (عربي)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 12),
                 Expanded(
-                  child: TextFormField(
-                    controller: _addressEnController,
+                  child: _buildTextField(
+                    _addressEnController,
+                    'Address (English)',
                     maxLines: 2,
-                    decoration: InputDecoration(
-                      labelText: 'Address (English)',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 16),
+
+            // Save Button
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saveStoreInfo,
+              height: 40,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _saveStoreInfo,
+                icon: _isLoading
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(Icons.save_outlined, size: 18),
+                label: Text(
+                  'حفظ معلومات المتجر',
+                  style: TextStyle(fontSize: 12),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF2196F3),
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Color(0xFF667eea),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-                child: Text('حفظ معلومات المتجر'),
               ),
             ),
           ],
@@ -303,14 +298,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildDeliverySection() {
     return Container(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
             offset: Offset(0, 2),
           ),
         ],
@@ -320,105 +315,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  controller: _deliveryFeeController,
+                child: _buildTextField(
+                  _deliveryFeeController,
+                  'رسوم التوصيل (د.ع)',
+                  icon: Icons.delivery_dining_outlined,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'رسوم التوصيل (د.ع)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    prefixIcon: Icon(Icons.delivery_dining),
-                  ),
                 ),
               ),
-              SizedBox(width: 16),
+              SizedBox(width: 12),
               Expanded(
-                child: TextFormField(
-                  controller: _minimumOrderController,
+                child: _buildTextField(
+                  _minimumOrderController,
+                  'الحد الأدنى (د.ع)',
+                  icon: Icons.shopping_cart_outlined,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'الحد الأدنى للطلب (د.ع)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    prefixIcon: Icon(Icons.shopping_cart),
-                  ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: _freeDeliveryController,
+          SizedBox(height: 12),
+          _buildTextField(
+            _freeDeliveryController,
+            'توصيل مجاني للطلبات أكثر من (د.ع)',
+            icon: Icons.local_shipping_outlined,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: 'توصيل مجاني للطلبات أكثر من (د.ع)',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              prefixIcon: Icon(Icons.local_shipping),
-            ),
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            height: 40,
+            child: ElevatedButton.icon(
               onPressed: _saveDeliverySettings,
+              icon: Icon(Icons.save_outlined, size: 18),
+              label: Text('حفظ إعدادات التوصيل', style: TextStyle(fontSize: 12)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(vertical: 16),
+                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text('حفظ إعدادات التوصيل'),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppSettingsSection() {
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          SwitchListTile(
-            title: Text('تفعيل الإشعارات'),
-            subtitle: Text('إرسال إشعارات للمستخدمين'),
-            value: _enableNotifications,
-            onChanged: (value) {
-              setState(() => _enableNotifications = value);
-              _saveAppSettings();
-            },
-            activeColor: Color(0xFF2196F3),
-          ),
-          Divider(),
-          SwitchListTile(
-            title: Text('تفعيل الطلبات'),
-            subtitle: Text('السماح بإستقبال طلبات جديدة'),
-            value: _enableOrders,
-            onChanged: (value) {
-              setState(() => _enableOrders = value);
-              _saveAppSettings();
-            },
-            activeColor: Color(0xFF2196F3),
-          ),
-          Divider(),
-          SwitchListTile(
-            title: Text('وضع الصيانة'),
-            subtitle: Text('إيقاف التطبيق مؤقتاً للصيانة'),
-            value: _maintenanceMode,
-            onChanged: (value) {
-              setState(() => _maintenanceMode = value);
-              _saveAppSettings();
-            },
-            activeColor: Colors.orange,
           ),
         ],
       ),
@@ -427,147 +363,107 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildCategoriesSection() {
     return Container(
-      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
             offset: Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(Icons.category, color: Color(0xFF2196F3)),
-            title: Text('إدارة التصنيفات'),
-            subtitle: Text('إضافة وتعديل وحذف تصنيفات المنتجات'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: () {  // Changed from onPressed to onTap
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CategoryManagementScreen()),
-              );
-            },
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CategoryManagementScreen()),
+            );
+          },
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.category_outlined, color: Colors.orange, size: 20),
+                ),
+                SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'إدارة التصنيفات',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1a1a2e),
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'إضافة وتعديل وحذف تصنيفات المنتجات',
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildAdminSection() {
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _currentPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'كلمة المرور الحالية',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              prefixIcon: Icon(Icons.lock),
-            ),
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: _newPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'كلمة المرور الجديدة',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              prefixIcon: Icon(Icons.lock_outline),
-            ),
-          ),
-          SizedBox(height: 16),
-          TextFormField(
-            controller: _confirmPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'تأكيد كلمة المرور',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              prefixIcon: Icon(Icons.lock_outline),
-            ),
-          ),
-          SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _changePassword,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: Text('تغيير كلمة المرور'),
-            ),
-          ),
-        ],
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, {
+    IconData? icon,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      style: TextStyle(fontSize: 13),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 11),
+        prefixIcon: icon != null ? Icon(icon, size: 18, color: Colors.grey[500]) : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       ),
     );
   }
 
-  Widget _buildBackupSection() {
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(Icons.backup, color: Colors.green),
-            title: Text('نسخة احتياطية'),
-            subtitle: Text('إنشاء نسخة احتياطية من البيانات'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: _createBackup,
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.download, color: Colors.blue),
-            title: Text('تصدير البيانات'),
-            subtitle: Text('تصدير البيانات إلى Excel'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: _exportData,
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.restore, color: Colors.orange),
-            title: Text('استعادة البيانات'),
-            subtitle: Text('استعادة من نسخة احتياطية'),
-            trailing: Icon(Icons.arrow_forward_ios),
-            onTap: _restoreBackup,
-          ),
-        ],
-      ),
-    );
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message, style: TextStyle(fontSize: 13)),
+          backgroundColor: isError ? Colors.red : Color(0xFF667eea),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 
   Future<void> _saveStoreInfo() async {
-    if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
 
     try {
@@ -589,13 +485,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم حفظ معلومات المتجر بنجاح')),
-      );
+      _showSnackBar('تم حفظ معلومات المتجر');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-      );
+      _showSnackBar('خطأ: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -613,130 +505,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم حفظ إعدادات التوصيل بنجاح')),
-      );
+      _showSnackBar('تم حفظ إعدادات التوصيل');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-      );
+      _showSnackBar('خطأ: $e', isError: true);
     }
-  }
-
-  Future<void> _saveAppSettings() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('settings')
-          .doc('app')
-          .set({
-        'enableNotifications': _enableNotifications,
-        'enableOrders': _enableOrders,
-        'maintenanceMode': _maintenanceMode,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم حفظ إعدادات التطبيق')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-  Future<void> _changePassword() async {
-    if (_newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('كلمات المرور غير متطابقة'), backgroundColor: Colors.red),
-      );
-      return;
-    }
-
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Re-authenticate
-        final credential = EmailAuthProvider.credential(
-          email: user.email!,
-          password: _currentPasswordController.text,
-        );
-        await user.reauthenticateWithCredential(credential);
-
-        // Change password
-        await user.updatePassword(_newPasswordController.text);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم تغيير كلمة المرور بنجاح')),
-        );
-
-        // Clear fields
-        _currentPasswordController.clear();
-        _newPasswordController.clear();
-        _confirmPasswordController.clear();
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-      );
-    }
-  }
-
-  void _createBackup() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('جاري إنشاء نسخة احتياطية...')),
-    );
-  }
-
-  void _exportData() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('جاري تصدير البيانات...')),
-    );
-  }
-
-  void _restoreBackup() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('تحذير'),
-        content: Text('سيتم استبدال جميع البيانات الحالية. هل أنت متأكد؟'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('جاري استعادة البيانات...')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('استعادة'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _storeNameArController.dispose();
-    _storeNameEnController.dispose();
-    _homeTitleArController.dispose();
-    _homeTitleEnController.dispose();
-    _phoneController.dispose();
-    _whatsappController.dispose();
-    _emailController.dispose();
-    _addressArController.dispose();
-    _addressEnController.dispose();
-    _deliveryFeeController.dispose();
-    _minimumOrderController.dispose();
-    _freeDeliveryController.dispose();
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
   }
 }
