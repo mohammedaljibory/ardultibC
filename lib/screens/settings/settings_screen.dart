@@ -15,6 +15,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Store Settings Controllers
   final _storeNameArController = TextEditingController();
   final _storeNameEnController = TextEditingController();
+  final _homeTitleArController = TextEditingController();
+  final _homeTitleEnController = TextEditingController();
   final _phoneController = TextEditingController();
   final _whatsappController = TextEditingController();
   final _emailController = TextEditingController();
@@ -53,6 +55,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         final data = doc.data()!;
         _storeNameArController.text = data['company_name_ar'] ?? '';
         _storeNameEnController.text = data['company_name_en'] ?? '';
+        _homeTitleArController.text = data['home_page_title_ar'] ?? '';
+        _homeTitleEnController.text = data['home_page_title_en'] ?? '';
         _phoneController.text = data['mobile_numbers_ar'] ?? '';
         _whatsappController.text = data['whatsapp_number'] ?? '';
         _emailController.text = data['email_ar'] ?? '';
@@ -187,6 +191,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     controller: _storeNameEnController,
                     decoration: InputDecoration(
                       labelText: 'Store Name (English)',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _homeTitleArController,
+                    decoration: InputDecoration(
+                      labelText: 'عنوان الصفحة الرئيسية (عربي)',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _homeTitleEnController,
+                    decoration: InputDecoration(
+                      labelText: 'Home Page Title (English)',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
@@ -549,6 +577,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           .update({
         'company_name_ar': _storeNameArController.text,
         'company_name_en': _storeNameEnController.text,
+        'home_page_title_ar': _homeTitleArController.text,
+        'home_page_title_en': _homeTitleEnController.text,
         'mobile_numbers_ar': _phoneController.text,
         'mobile_numbers_en': _phoneController.text,
         'whatsapp_number': _whatsappController.text,
@@ -694,6 +724,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void dispose() {
     _storeNameArController.dispose();
     _storeNameEnController.dispose();
+    _homeTitleArController.dispose();
+    _homeTitleEnController.dispose();
     _phoneController.dispose();
     _whatsappController.dispose();
     _emailController.dispose();
