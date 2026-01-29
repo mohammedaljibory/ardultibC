@@ -6,6 +6,7 @@ import '../users/users_management_screen.dart';
 import '../products/products_management_screen.dart';
 import '../settings/settings_screen.dart';
 import '../image_control_screen.dart';
+import '../banner_management_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -21,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     OrdersManagementScreen(),
     ProductsManagementScreen(),
     UsersManagementScreen(),
+    BannerManagementScreen(),
     ImageControlScreen(),
     SettingsScreen(),
   ];
@@ -30,6 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     NavigationItem(Icons.shopping_cart, 'الطلبات', Color(0xFF388E3C)),
     NavigationItem(Icons.inventory, 'المنتجات', Color(0xFFE64A19)),
     NavigationItem(Icons.people, 'المستخدمين', Color(0xFF7B1FA2)),
+    NavigationItem(Icons.view_carousel, 'البانرات', Color(0xFFE91E63)),
     NavigationItem(Icons.image, 'الصور', Color(0xFF0097A7)),
     NavigationItem(Icons.settings, 'الإعدادات', Color(0xFF616161)),
   ];
