@@ -4,11 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../orders/order_management_screen.dart';
 import '../users/users_management_screen.dart';
 import '../products/products_management_screen.dart';
-import '../analytics/analytics_screen.dart';
 import '../settings/settings_screen.dart';
-import '../store_management_screen.dart';
 import '../image_control_screen.dart';
-import '../text_control_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -24,23 +21,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     OrdersManagementScreen(),
     ProductsManagementScreen(),
     UsersManagementScreen(),
-    AnalyticsScreen(),
-    StoreManagementScreen(),
     ImageControlScreen(),
-    TextControlScreen(),
     SettingsScreen(),
   ];
 
   final List<NavigationItem> _navigationItems = [
-    NavigationItem(Icons.dashboard, 'الرئيسية', Colors.blue),
-    NavigationItem(Icons.shopping_cart, 'الطلبات', Colors.green),
-    NavigationItem(Icons.inventory, 'المنتجات', Colors.orange),
-    NavigationItem(Icons.people, 'المستخدمين', Colors.purple),
-    NavigationItem(Icons.analytics, 'التحليلات', Colors.teal),
-    NavigationItem(Icons.store, 'المتجر', Colors.indigo),
-    NavigationItem(Icons.image, 'الصور', Colors.pink),
-    NavigationItem(Icons.text_fields, 'النصوص', Colors.amber),
-    NavigationItem(Icons.settings, 'الإعدادات', Colors.grey),
+    NavigationItem(Icons.dashboard, 'الرئيسية', Color(0xFF1976D2)),
+    NavigationItem(Icons.shopping_cart, 'الطلبات', Color(0xFF388E3C)),
+    NavigationItem(Icons.inventory, 'المنتجات', Color(0xFFE64A19)),
+    NavigationItem(Icons.people, 'المستخدمين', Color(0xFF7B1FA2)),
+    NavigationItem(Icons.image, 'الصور', Color(0xFF0097A7)),
+    NavigationItem(Icons.settings, 'الإعدادات', Color(0xFF616161)),
   ];
 
   @override
@@ -112,7 +103,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         // Logo and User Info
         Container(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -123,24 +114,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             children: [
               CircleAvatar(
-                radius: 40,
+                radius: 32,
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.admin_panel_settings,
-                  size: 40,
+                  size: 32,
                   color: Color(0xFF2196F3),
                 ),
               ),
-              SizedBox(height: 12),
+              SizedBox(height: 8),
               Text(
                 'لوحة تحكم أرض الطب',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 4),
+              SizedBox(height: 2),
               StreamBuilder<User?>(
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (context, snapshot) {
@@ -148,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     snapshot.data?.email ?? 'admin@medicalland.com',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 12,
+                      fontSize: 11,
                     ),
                   );
                 },
@@ -398,18 +389,18 @@ class DashboardHome extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'مرحباً بك في لوحة التحكم',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 4),
             Text(
               'نظرة عامة على متجرك',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             ),
             SizedBox(height: 32),
             Expanded(

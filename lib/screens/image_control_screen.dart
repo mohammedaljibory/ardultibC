@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img; // لضغط الصور
+import 'package:image/image.dart' as img;
 import 'dart:typed_data';
 
 class ImageControlScreen extends StatefulWidget {
@@ -45,28 +45,21 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
             _galleryImage = File(pickedFile.path);
           }
         });
-      } else {
-        // No image selected
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error picking image: $e")),
+        SnackBar(content: Text("خطأ في اختيار الصورة: $e"), backgroundColor: Colors.red),
       );
     }
   }
 
   Future<File> _compressImage(File imageFile) async {
-    // قراءة الصورة
     final img.Image? image = img.decodeImage(await imageFile.readAsBytes());
-    if (image == null) throw Exception("Failed to decode image");
+    if (image == null) throw Exception("فشل في قراءة الصورة");
 
-    // تغيير حجم الصورة إذا لزم الأمر (مثلاً 800px كحد أقصى للعرض)
     final img.Image resizedImage = img.copyResize(image, width: 800);
-
-    // ضغط الصورة بجودة 70%
     final Uint8List compressedImage = img.encodeJpg(resizedImage, quality: 70);
 
-    // حفظ الصورة المضغوطة في ملف مؤقت
     final tempDir = Directory.systemTemp;
     final tempFile = File('${tempDir.path}/temp_${DateTime.now().millisecondsSinceEpoch}.jpg');
     await tempFile.writeAsBytes(compressedImage);
@@ -77,7 +70,10 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
   Future<void> _uploadPostImage() async {
     if (_postImage == null || _postTitleArController.text.isEmpty || _postTitleEnController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select an image and enter titles in both languages")),
+        const SnackBar(
+          content: Text("الرجاء اختيار صورة وإدخال العنوان بالعربية والإنجليزية"),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -119,14 +115,17 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
         _postTitleEnController.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Post image uploaded successfully!")),
+        const SnackBar(
+          content: Text("تم رفع الصورة بنجاح"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       setState(() {
         _isUploadingPost = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error uploading post image: $e")),
+        SnackBar(content: Text("خطأ في رفع الصورة: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -134,7 +133,10 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
   Future<void> _uploadGalleryImage() async {
     if (_galleryImage == null || _galleryTitleArController.text.isEmpty || _galleryTitleEnController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select an image and enter titles in both languages")),
+        const SnackBar(
+          content: Text("الرجاء اختيار صورة وإدخال العنوان بالعربية والإنجليزية"),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -176,14 +178,17 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
         _galleryTitleEnController.clear();
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gallery image uploaded successfully!")),
+        const SnackBar(
+          content: Text("تم رفع الصورة إلى المعرض بنجاح"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       setState(() {
         _isUploadingGallery = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error uploading gallery image: $e")),
+        SnackBar(content: Text("خطأ في رفع الصورة: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -192,16 +197,16 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Confirm Deletion"),
-        content: const Text("Are you sure you want to delete this image?"),
+        title: const Text("تأكيد الحذف"),
+        content: const Text("هل أنت متأكد من حذف هذه الصورة؟"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel"),
+            child: const Text("إلغاء"),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            child: const Text("حذف", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -216,11 +221,14 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
       }
       await collection.doc(docId).delete();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Image deleted successfully!")),
+        const SnackBar(
+          content: Text("تم حذف الصورة بنجاح"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error deleting image: $e")),
+        SnackBar(content: Text("خطأ في حذف الصورة: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -229,8 +237,9 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Images"),
-        backgroundColor: const Color(0xFF6A11CB),
+        title: const Text("إدارة الصور", style: TextStyle(color: Colors.white, fontSize: 16)),
+        backgroundColor: const Color(0xFF0097A7),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -239,93 +248,207 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // قسم المناشئ (Posts Control)
-              const Text(
-                "Posts Control",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _postTitleArController,
-                decoration: const InputDecoration(
-                  labelText: "Post Title (Arabic)",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _postTitleEnController,
-                decoration: const InputDecoration(
-                  labelText: "Post Title (English)",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _postImage != null
-                  ? Image.file(_postImage!, height: 100, fit: BoxFit.cover)
-                  : const Text("Select an image to upload"),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: _isUploadingPost ? null : () => _pickImage(true),
-                    child: const Text("Pick Post Image"),
-                  ),
-                  const SizedBox(width: 10),
-                  _isUploadingPost
-                      ? Stack(
-                    alignment: Alignment.center,
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircularProgressIndicator(
-                        value: _uploadProgress,
-                        strokeWidth: 6,
-                        color: const Color(0xFF6A11CB),
-                        backgroundColor: Colors.grey[300],
+                      Row(
+                        children: [
+                          Icon(Icons.post_add, color: Color(0xFF0097A7), size: 20),
+                          SizedBox(width: 8),
+                          const Text(
+                            "إدارة المنشورات",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "${(_uploadProgress * 100).toStringAsFixed(0)}%",
-                        style: const TextStyle(fontSize: 12, color: Colors.black),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _postTitleArController,
+                        style: TextStyle(fontSize: 14),
+                        decoration: const InputDecoration(
+                          labelText: "عنوان المنشور (عربي)",
+                          labelStyle: TextStyle(fontSize: 13),
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _postTitleEnController,
+                        style: TextStyle(fontSize: 14),
+                        decoration: const InputDecoration(
+                          labelText: "عنوان المنشور (إنجليزي)",
+                          labelStyle: TextStyle(fontSize: 13),
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _postImage != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(_postImage!, height: 120, width: double.infinity, fit: BoxFit.cover),
+                            )
+                          : Container(
+                              height: 80,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.image_outlined, color: Colors.grey[400], size: 32),
+                                  SizedBox(height: 4),
+                                  Text("اختر صورة للرفع", style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: _isUploadingPost ? null : () => _pickImage(true),
+                              icon: Icon(Icons.photo_library, size: 18),
+                              label: const Text("اختيار صورة", style: TextStyle(fontSize: 13)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Color(0xFF0097A7),
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _isUploadingPost
+                                ? Container(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            value: _uploadProgress,
+                                            strokeWidth: 3,
+                                            color: Color(0xFF0097A7),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          "${(_uploadProgress * 100).toStringAsFixed(0)}%",
+                                          style: TextStyle(fontSize: 13, color: Color(0xFF0097A7)),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ElevatedButton.icon(
+                                    onPressed: _uploadPostImage,
+                                    icon: Icon(Icons.upload, size: 18),
+                                    label: const Text("رفع المنشور", style: TextStyle(fontSize: 13)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF0097A7),
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                          ),
+                        ],
                       ),
                     ],
-                  )
-                      : ElevatedButton(
-                    onPressed: _uploadPostImage,
-                    child: const Text("Upload Post"),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6A11CB)),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
+
+              // عرض المنشورات الحالية
+              const Text(
+                "المنشورات الحالية",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
               StreamBuilder(
                 stream: postsCollection.orderBy('timestamp', descending: true).snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Text("No posts available.");
+                    return Container(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Text("لا توجد منشورات", style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                      ),
+                    );
                   }
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                     children: snapshot.data!.docs.map((doc) {
                       final data = doc.data() as Map<String, dynamic>;
                       return Card(
-                        margin: const EdgeInsets.all(8),
+                        elevation: 2,
+                        clipBehavior: Clip.antiAlias,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
+                              flex: 3,
                               child: Image.network(
                                 data['url'],
                                 fit: BoxFit.cover,
                                 width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Icon(Icons.broken_image, color: Colors.grey),
+                                  );
+                                },
                               ),
                             ),
-                            Text(data['title_ar'] ?? 'No Arabic Title'),
-                            Text(data['title_en'] ?? 'No English Title'),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteImage(data['url'], doc.id, postsCollection),
+                            Expanded(
+                              flex: 2,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data['title_ar'] ?? 'بدون عنوان',
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      data['title_en'] ?? 'No title',
+                                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Spacer(),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                                        onPressed: () => _deleteImage(data['url'], doc.id, postsCollection),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -334,96 +457,210 @@ class _ImageControlScreenState extends State<ImageControlScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
               // قسم المعرض (Gallery)
-              const Text(
-                "Gallery",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _galleryTitleArController,
-                decoration: const InputDecoration(
-                  labelText: "Gallery Image Title (Arabic)",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: _galleryTitleEnController,
-                decoration: const InputDecoration(
-                  labelText: "Gallery Image Title (English)",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _galleryImage != null
-                  ? Image.file(_galleryImage!, height: 100, fit: BoxFit.cover)
-                  : const Text("Select an image to upload"),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: _isUploadingGallery ? null : () => _pickImage(false),
-                    child: const Text("Pick Gallery Image"),
-                  ),
-                  const SizedBox(width: 10),
-                  _isUploadingGallery
-                      ? Stack(
-                    alignment: Alignment.center,
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircularProgressIndicator(
-                        value: _uploadProgress,
-                        strokeWidth: 6,
-                        color: const Color(0xFF6A11CB),
-                        backgroundColor: Colors.grey[300],
+                      Row(
+                        children: [
+                          Icon(Icons.photo_library, color: Color(0xFF0097A7), size: 20),
+                          SizedBox(width: 8),
+                          const Text(
+                            "إدارة المعرض",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                      Text(
-                        "${(_uploadProgress * 100).toStringAsFixed(0)}%",
-                        style: const TextStyle(fontSize: 12, color: Colors.black),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _galleryTitleArController,
+                        style: TextStyle(fontSize: 14),
+                        decoration: const InputDecoration(
+                          labelText: "عنوان الصورة (عربي)",
+                          labelStyle: TextStyle(fontSize: 13),
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _galleryTitleEnController,
+                        style: TextStyle(fontSize: 14),
+                        decoration: const InputDecoration(
+                          labelText: "عنوان الصورة (إنجليزي)",
+                          labelStyle: TextStyle(fontSize: 13),
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _galleryImage != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(_galleryImage!, height: 120, width: double.infinity, fit: BoxFit.cover),
+                            )
+                          : Container(
+                              height: 80,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.image_outlined, color: Colors.grey[400], size: 32),
+                                  SizedBox(height: 4),
+                                  Text("اختر صورة للرفع", style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: _isUploadingGallery ? null : () => _pickImage(false),
+                              icon: Icon(Icons.photo_library, size: 18),
+                              label: const Text("اختيار صورة", style: TextStyle(fontSize: 13)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Color(0xFF0097A7),
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _isUploadingGallery
+                                ? Container(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            value: _uploadProgress,
+                                            strokeWidth: 3,
+                                            color: Color(0xFF0097A7),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          "${(_uploadProgress * 100).toStringAsFixed(0)}%",
+                                          style: TextStyle(fontSize: 13, color: Color(0xFF0097A7)),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ElevatedButton.icon(
+                                    onPressed: _uploadGalleryImage,
+                                    icon: Icon(Icons.upload, size: 18),
+                                    label: const Text("رفع للمعرض", style: TextStyle(fontSize: 13)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF0097A7),
+                                      foregroundColor: Colors.white,
+                                      padding: EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                          ),
+                        ],
                       ),
                     ],
-                  )
-                      : ElevatedButton(
-                    onPressed: _uploadGalleryImage,
-                    child: const Text("Upload to Gallery"),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6A11CB)),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+
+              // عرض صور المعرض
+              const Text(
+                "صور المعرض",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
               StreamBuilder(
                 stream: galleryCollection.orderBy('timestamp', descending: true).snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Text("No gallery images available.");
+                    return Container(
+                      padding: EdgeInsets.all(16),
+                      child: Center(
+                        child: Text("لا توجد صور في المعرض", style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                      ),
+                    );
                   }
                   return GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 2,
+                    childAspectRatio: 0.85,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                     children: snapshot.data!.docs.map((doc) {
                       final data = doc.data() as Map<String, dynamic>;
                       return Card(
-                        margin: const EdgeInsets.all(8),
+                        elevation: 2,
+                        clipBehavior: Clip.antiAlias,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
+                              flex: 3,
                               child: Image.network(
                                 data['url'],
                                 fit: BoxFit.cover,
                                 width: double.infinity,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Icon(Icons.broken_image, color: Colors.grey),
+                                  );
+                                },
                               ),
                             ),
-                            Text(data['title_ar'] ?? 'No Arabic Title'),
-                            Text(data['title_en'] ?? 'No English Title'),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteImage(data['url'], doc.id, galleryCollection),
+                            Expanded(
+                              flex: 2,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data['title_ar'] ?? 'بدون عنوان',
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      data['title_en'] ?? 'No title',
+                                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Spacer(),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                                        onPressed: () => _deleteImage(data['url'], doc.id, galleryCollection),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ],
                         ),
